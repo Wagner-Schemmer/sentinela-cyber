@@ -4,7 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sentinela Cyber — Senhas fortes e anti-phishing</title>
-<meta name="description" content="Analisador de força de senhas, gerador de senhas seguras e verificador de links suspeitos. 100% no navegador, nada sai do seu dispositivo.">
+<meta name="description" content="Analisador de força de senhas, verificação de vazamentos reais, gerador seguro e detector de links de phishing. 100% no navegador.">
+<meta property="og:title" content="Sentinela Cyber — Senhas fortes e anti-phishing">
+<meta property="og:description" content="Será que sua senha aguenta um ataque? Teste grátis, sem cadastro, sem enviar nada.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0a0e14">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Sentinela Cyber","applicationCategory":"SecurityApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0"},"description":"Analisador de senhas, gerador seguro e verificador anti-phishing 100% local."}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
@@ -14,7 +23,7 @@
 <header class="top">
   <div class="wrap top-in">
     <a class="logo" href="#">🛡️ SENTINELA<span>_CYBER</span></a>
-    <nav><a href="#forca">Força</a><a href="#gerador">Gerador</a><a href="#links">Links</a><a href="#checklist">Checklist</a></nav>
+    <nav><a href="#forca">Força</a><a href="#gerador">Gerador</a><a href="#links">Links</a><a href="#checklist">Checklist</a><a href="#faq">FAQ</a></nav>
   </div>
 </header>
 
@@ -40,10 +49,18 @@
     <p id="pwdVerdict" class="verdict">Aguardando senha…</p>
     <ul id="pwdChecks" class="checks"></ul>
     <p class="hint">Estimativa de quebra por força bruta: <strong id="crackTime">—</strong></p>
+    <div class="breach">
+      <button id="breachBtn" class="btn warn">🔎 Verificar vazamento real</button>
+      <p id="breachOut" class="hint">Consulta anonimizada (só os 5 primeiros dígitos do hash saem do aparelho).</p>
+    </div>
   </section>
 
   <section id="gerador" class="panel">
     <h2>02 — Gerador de senhas</h2>
+    <div class="modes">
+      <button data-gm="pass" class="chip active">Aleatória</button>
+      <button data-gm="words" class="chip">Frase-senha</button>
+    </div>
     <div class="row">
       <input type="text" id="genOut" readonly placeholder="Clique em gerar…">
       <button id="copyGen" class="ghost">📋</button>
@@ -59,6 +76,8 @@
       <label><input type="checkbox" id="gAmb"> sem ambíguos (0/O, 1/l)</label>
     </div>
     <button id="genBtn" class="btn">⚡ Gerar senha forte</button>
+    <div id="genHist" class="hist"></div>
+    <p class="hint">Histórico só desta sessão — <button id="clearHist" class="link">limpar</button> ao sair de PC público.</p>
   </section>
 
   <section id="links" class="panel">
@@ -68,7 +87,9 @@
       <input type="text" id="urlIn" placeholder="https://exemplo-suspeito.com/promocao" autocomplete="off">
       <button id="urlBtn" class="btn">🔍 Verificar</button>
     </div>
+    <div class="meter risk"><div id="urlScore"></div></div>
     <div id="urlResult"></div>
+    <button id="urlCopy" class="ghost hidden">📋 Copiar relatório</button>
   </section>
 
   <section id="checklist" class="panel">
@@ -76,7 +97,16 @@
     <div id="chkList" class="checklist"></div>
     <div class="meter"><div id="chkFill"></div></div>
   </section>
+
+  <section class="panel" id="faq">
+    <h2>05 — Perguntas frequentes</h2>
+    <details open><summary>Minha senha sai do meu celular/PC?</summary><p>Não. A análise de força roda 100% aqui. Na verificação de vazamento, só os 5 primeiros caracteres do hash SHA-1 viajam (técnica k-anonymity) — impossível reconstruir sua senha a partir disso.</p></details>
+    <details><summary>O que é uma senha realmente forte?</summary><p>Longa (12+ caracteres), única por site e gerada aleatoriamente. Ative a verificação em 2 etapas onde houver — ela protege mesmo se a senha vazar.</p></details>
+    <details><summary>Recebi um link no WhatsApp, e agora?</summary><p>Cole acima. Desconfie de urgência (“conta bloqueada”), prêmios e remetente desconhecido. Na dúvida, acesse o serviço pelo app oficial, nunca pelo link.</p></details>
+    <details><summary>Frase-senha ou senha aleatória?</summary><p>As duas são boas se longas. Frases (4–6 palavras) são fáceis de digitar no celular; aleatórias são ideais com gerenciador de senhas.</p></details>
+  </section>
 </main>
+<div id="toast"></div>
 
 <footer><div class="wrap">
   <p><strong>Sentinela Cyber</strong> — projeto educacional de Wagner Schemmer. Heurísticas locais, sem garantia absoluta: na dúvida, não clique.</p>

@@ -1,7 +1,13 @@
-// ===== Sentinela Cyber — 100% local =====
-let tests = 0;
+// ===== Sentinela Cyber — 100% local (+ consulta anonimizada opcional) =====
+let tests = 0, lastPwd = "", lastReport = "";
 const $ = id => document.getElementById(id);
-const COMMON = ["123456","password","123456789","qwerty","senha","12345678","111111","abc123","brasil","flamengo"];
+const COMMON = ["123456","password","123456789","qwerty","senha","12345678","111111","abc123","brasil","flamengo","corinthians","palmeiras"];
+const WORDS = ["abacaxi","ponte","tigre","nuvem","farol","sombra","vento","lago","pedra","foguete","ilha","trem","lua","cacto","rio","montanha","gato","livro","chave","porta","janela","estrela","mar","sol","chuva","neve","areia","folha","raiz","tronco","abelha","cavalo","pato","sapo","urso","zebra","cobra","aranha","borboleta","tubarão","golfinho","papagaio","coruja","lobo","raposa","onça","tatu","capivara","jabuti"];
+
+function toast(msg) {
+  const t = $("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2200);
+}
 
 // ---------- 01 Força ----------
 $("togglePwd").onclick = () => {
@@ -11,7 +17,8 @@ $("togglePwd").onclick = () => {
 $("pwd").addEventListener("input", e => analyze(e.target.value));
 
 function analyze(pwd) {
-  tests++; $("stTests").textContent = tests;
+  lastPwd = pwd; tests++; $("stTests").textContent = tests;
+  $("breachOut").textContent = "Consulta anonimizada (só os 5 primeiros dígitos do hash saem do aparelho).";
   const fill = $("meterFill"), v = $("pwdVerdict"), ul = $("pwdChecks");
   if (!pwd) { fill.style.width = "0%"; v.textContent = "Aguardando senha…"; ul.innerHTML = ""; $("crackTime").textContent = "—"; return; }
   let pool = 0;
@@ -19,8 +26,7 @@ function analyze(pwd) {
         hasD = /[0-9]/.test(pwd), hasS = /[^a-zA-Z0-9]/.test(pwd);
   if (hasL) pool += 26; if (hasU) pool += 26; if (hasD) pool += 10; if (hasS) pool += 33;
   const entropy = pwd.length * Math.log2(pool || 1);
-  const guesses = Math.pow(2, entropy - 1) / 1e10; // 10 bi tentativas/s
-  $("crackTime").textContent = humanTime(guesses);
+  $("crackTime").textContent = humanTime(Math.pow(2, entropy - 1) / 1e10);
   const checks = [
     [pwd.length >= 12, `Mínimo 12 caracteres (tem ${pwd.length})`],
     [hasL && hasU, "Maiúsculas e minúsculas"],
@@ -28,15 +34,15 @@ function analyze(pwd) {
     [hasS, "Símbolos (!@#…)"],
     [!COMMON.includes(pwd.toLowerCase()), "Não é senha comum/vazada"],
     [!/(.)\1{2,}/.test(pwd), "Sem repetições (aaa, 111)"],
+    [!/123|abc|qwe/i.test(pwd), "Sem sequências óbvias"],
   ];
-  const ok = checks.filter(c => c[0]).length;
   ul.innerHTML = checks.map(([o, t]) => `<li class="${o ? "ok" : "bad"}">${o ? "✔" : "✖"} ${t}</li>`).join("");
-  const pct = Math.min(100, Math.round(entropy / 90 * 100));
+  const pct = Math.min(100, Math.round(entropy / 100 * 100));
   fill.style.width = pct + "%";
   let label, color;
   if (entropy < 35) { label = "🔴 FRACA — troca urgente"; color = "var(--red)"; }
   else if (entropy < 55) { label = "🟡 RAZOÁVEL — dá pra melhorar"; color = "var(--amber)"; }
-  else if (entropy < 75) { label = "🟢 FORTE — bom trabalho"; color = "var(--green)"; }
+  else if (entropy < 80) { label = "🟢 FORTE — bom trabalho"; color = "var(--green)"; }
   else { label = "🛡️ BLINDADA — nível excelente"; color = "var(--green)"; }
   fill.style.background = color; v.textContent = label + ` (${Math.round(entropy)} bits)`;
 }
@@ -46,62 +52,116 @@ function humanTime(s) {
   for (const [d, n] of u) if (s >= d) { const x = Math.floor(s / d); return `~${x.toLocaleString("pt-BR")} ${n}`; }
 }
 
-// ---------- 02 Gerador ----------
-function gen() {
-  const L = +$("genLen").value; $("lenVal").textContent = L;
-  let alpha = "";
-  if ($("gLower").checked) alpha += "abcdefghijkmnopqrstuvwxyz";
-  if ($("gUpper").checked) alpha += "ABCDEFGHJKLMNPQRSTUVWXYZ";
-  if ($("gDigit").checked) alpha += "23456789";
-  if ($("gSym").checked) alpha += "!@#$%&*+-=?";
-  // alfabetos-base já excluem ambíguos; se o modo estrito estiver desligado, inclui 0/O/1/l
-  if (!$("gAmb").checked) {
-    if ($("gLower").checked) alpha += "l";
-    if ($("gUpper").checked) alpha += "OI";
-    if ($("gDigit").checked) alpha += "01";
-  }
-  if (!alpha) { $("genOut").value = "Marque ao menos um grupo!"; return; }
-  const buf = new Uint32Array(L); crypto.getRandomValues(buf);
-  $("genOut").value = [...buf].map(n => alpha[n % alpha.length]).join("");
+// ---------- 01b Vazamento real (k-anonymity, HaveIBeenPwned) ----------
+async function sha1hex(str) {
+  const buf = await crypto.subtle.digest("SHA-1", new TextEncoder().encode(str));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("").toUpperCase();
 }
-$("genLen").oninput = () => $("lenVal").textContent = $("genLen").value;
-$("genBtn").onclick = gen;
-$("copyGen").onclick = async () => {
-  if (!$("genOut").value) return;
-  await navigator.clipboard.writeText($("genOut").value);
-  $("copyGen").textContent = "✔";
-  setTimeout(() => $("copyGen").textContent = "📋", 1200);
+$("breachBtn").onclick = async () => {
+  if (!lastPwd) { toast("Digite uma senha primeiro"); return; }
+  $("breachOut").textContent = "Consultando base de vazamentos…";
+  try {
+    const hash = await sha1hex(lastPwd);
+    const res = await fetch("https://api.pwnedpasswords.com/range/" + hash.slice(0, 5));
+    if (!res.ok) throw 0;
+    const txt = await res.text();
+    const line = txt.split("\n").find(l => l.split(":")[0].trim() === hash.slice(5));
+    const n = line ? +line.split(":")[1].trim() : 0;
+    $("breachOut").innerHTML = n > 0
+      ? `🚨 <strong>Essa senha apareceu em ${n.toLocaleString("pt-BR")} vazamentos.</strong> Troque agora e ative 2FA.`
+      : `✅ <strong>Não encontrada em vazamentos conhecidos.</strong> Continue usando (única por site!).`;
+  } catch {
+    $("breachOut").textContent = "⚠️ Sem internet ou serviço indisponível. Tente de novo mais tarde.";
+  }
 };
+
+// ---------- 02 Gerador ----------
+let genMode = "pass";
+document.querySelectorAll("#gerador .chip").forEach(c => c.onclick = () => {
+  genMode = c.dataset.gm;
+  document.querySelectorAll("#gerador .chip").forEach(x => x.classList.toggle("active", x === c));
+  $("genLen").disabled = genMode === "words";
+  gen();
+});
+const hist = [];
+function rnd(n) { const b = new Uint32Array(n); crypto.getRandomValues(b); return [...b]; }
+function gen() {
+  $("lenVal").textContent = $("genLen").value;
+  let out;
+  if (genMode === "words") {
+    out = rnd(5).map(n => WORDS[n % WORDS.length]).join("-") + "-" + (10 + rnd(1)[0] % 90);
+  } else {
+    const L = +$("genLen").value;
+    let alpha = "";
+    if ($("gLower").checked) alpha += "abcdefghijkmnopqrstuvwxyz";
+    if ($("gUpper").checked) alpha += "ABCDEFGHJKLMNPQRSTUVWXYZ";
+    if ($("gDigit").checked) alpha += "23456789";
+    if ($("gSym").checked) alpha += "!@#$%&*+-=?";
+    if (!$("gAmb").checked) {
+      if ($("gLower").checked) alpha += "l";
+      if ($("gUpper").checked) alpha += "OI";
+      if ($("gDigit").checked) alpha += "01";
+    }
+    if (!alpha) { $("genOut").value = "Marque ao menos um grupo!"; return; }
+    out = rnd(L).map(n => alpha[n % alpha.length]).join("");
+  }
+  $("genOut").value = out;
+  hist.unshift(out); if (hist.length > 6) hist.pop();
+  $("genHist").innerHTML = hist.map((h, i) =>
+    `<div><span>${h}</span><button data-h="${i}">copiar</button></div>`).join("");
+}
+$("genLen").oninput = () => { $("lenVal").textContent = $("genLen").value; };
+$("genBtn").onclick = gen;
+$("genHist").addEventListener("click", async e => {
+  const i = e.target.dataset.h; if (i === undefined) return;
+  await navigator.clipboard.writeText(hist[+i]); toast("Senha copiada!");
+});
+$("clearHist").onclick = () => { hist.length = 0; $("genHist").innerHTML = ""; toast("Histórico limpo"); };
+async function copyOut() {
+  if (!$("genOut").value) return;
+  await navigator.clipboard.writeText($("genOut").value); toast("Senha copiada!");
+}
+$("copyGen").onclick = copyOut;
 gen();
 
 // ---------- 03 Links ----------
-const SHORT = ["bit.ly", "tinyurl", "t.co", "goo.gl", "is.gd", "cutt.ly", "ow.ly"];
-const BRANDS = ["banco", "itau", "bradesco", "santander", "nubank", "caixa", "correios", "receita", "gov", "mercadolivre", "americanas", "netflix"];
+const SHORT = ["bit.ly", "tinyurl", "t.co", "goo.gl", "is.gd", "cutt.ly", "ow.ly", "bitly"];
+const BRANDS = ["itau", "bradesco", "santander", "nubank", "caixa", "correios", "receita", "gov", "mercadolivre", "americanas", "netflix", "whatsapp"];
 $("urlBtn").onclick = () => {
   const raw = $("urlIn").value.trim(), box = $("urlResult");
-  if (!raw) { box.innerHTML = ""; return; }
+  $("urlCopy").classList.add("hidden"); lastReport = "";
+  if (!raw) { box.innerHTML = ""; $("urlScore").style.width = "0%"; return; }
   let u; try { u = new URL(/^https?:\/\//i.test(raw) ? raw : "https://" + raw); }
   catch { box.innerHTML = `<div class="flag danger">❌ Nem consegui ler esse link. Não clique.</div>`; return; }
-  const flags = [];
+  const flags = []; // [gravidade 1-3, texto]
   const host = u.hostname.toLowerCase();
-  if (u.protocol === "http:") flags.push(["danger", "❌ Usa HTTP sem cadeado — dados viajam abertos."]);
-  if (/^\d+\.\d+\.\d+\.\d+$/.test(host)) flags.push(["danger", "❌ O endereço é um IP numérico, não um site real. Golpe clássico."]);
-  if (u.username || u.password || raw.includes("@")) flags.push(["danger", "❌ Contém @ — o domínio real vem DEPOIS do @."]);
-  if (host.includes("xn--")) flags.push(["danger", "❌ Domínio internacional disfarçado (punycode), imita letras de marcas."]);
-  if (SHORT.some(s => host.includes(s))) flags.push(["warn", "⚠️ Link encurtado: esconde o destino real. Expanda antes de clicar."]);
-  if (host.split(".").length - 1 >= 3) flags.push(["warn", "⚠️ Subdomínios demais — tenta parecer um site conhecido."]);
-  if (BRANDS.some(b => host.includes(b)) && !host.endsWith(".br") && !/\.com$/.test(host))
-    flags.push(["warn", "⚠️ Cita banco/loja famosa em domínio estranho. Confira o endereço oficial."]);
-  if (raw.length > 120) flags.push(["warn", "⚠️ URL muito longa — pode esconder o destino."]);
-  if (/promo|gratis|grátis|urgente|bloqueio|suspens|premio|prêmio/i.test(raw))
-    flags.push(["warn", "⚠️ Linguagem de urgência/prêmio — isca típica de phishing."]);
-  const danger = flags.filter(f => f[0] === "danger").length;
-  const head = danger > 0
-    ? `<div class="flag danger">🚨 RISCO ALTO — ${flags.length} sinal(is). Não clique, não informe dados.</div>`
-    : flags.length > 0
-    ? `<div class="flag">⚠️ SUSPEITO — ${flags.length} sinal(is). Confira pelo app/site oficial.</div>`
+  if (u.protocol === "http:") flags.push([3, "❌ HTTP sem cadeado — dados viajam abertos."]);
+  if (/^\d+\.\d+\.\d+\.\d+$/.test(host)) flags.push([3, "❌ Endereço IP numérico em vez de site real. Golpe clássico."]);
+  if (u.username || raw.includes("@")) flags.push([3, "❌ Contém @ — o domínio real vem DEPOIS do @."]);
+  if (host.includes("xn--")) flags.push([3, "❌ Domínio disfarçado (punycode) imitando marca famosa."]);
+  if (SHORT.some(s => host === s || host.endsWith("." + s))) flags.push([2, "⚠️ Link encurtado esconde o destino. Expanda antes."]);
+  if (host.split(".").length - 1 >= 3) flags.push([1, "⚠️ Subdomínios demais — tenta se passar por site conhecido."]);
+  if (BRANDS.some(b => host.includes(b))) flags.push([2, "⚠️ Cita marca famosa — confira no app/site oficial, nunca pelo link."]);
+  if (raw.length > 120) flags.push([1, "⚠️ URL muito longa, pode esconder o destino."]);
+  if (/promo|gratis|grátis|urgente|bloqueio|suspens|premio|prêmio|brinde|cupom/i.test(raw))
+    flags.push([2, "⚠️ Linguagem de urgência/prêmio — isca típica."]);
+  const score = Math.min(100, flags.reduce((a, f) => a + f[0] * 9, 0));
+  const bar = $("urlScore");
+  bar.style.width = Math.max(flags.length ? 12 : 0, score) + "%";
+  bar.style.background = score >= 50 ? "var(--red)" : score > 0 ? "var(--amber)" : "var(--green)";
+  const head = score >= 50
+    ? `<div class="flag danger">🚨 RISCO ALTO (${score}/100) — não clique, não informe dados.</div>`
+    : score > 0
+    ? `<div class="flag">⚠️ SUSPEITO (${score}/100) — confira pelo canal oficial.</div>`
     : `<div class="flag safe">✅ Nenhum sinal clássico de phishing. Mesmo assim, confira o remetente.</div>`;
-  box.innerHTML = head + flags.map(([c, t]) => `<div class="flag ${c === "danger" ? "danger" : ""}">${t}</div>`).join("");
+  box.innerHTML = head + flags.map(([, t]) =>
+    `<div class="flag ${/❌/.test(t) ? "danger" : ""}">${t}</div>`).join("");
+  lastReport = `SENTINELA CYBER — verificação de link\nLink: ${raw}\nRisco: ${score}/100\n` +
+    (flags.length ? flags.map(([, t]) => "- " + t.replace(/❌|⚠️/g, "").trim()).join("\n") : "- Nenhum sinal clássico detectado.");
+  $("urlCopy").classList.remove("hidden");
+};
+$("urlCopy").onclick = async () => {
+  await navigator.clipboard.writeText(lastReport); toast("Relatório copiado!");
 };
 
 // ---------- 04 Checklist ----------
@@ -113,7 +173,7 @@ const ITEMS = [
   "Não uso a mesma senha em tudo (uso gerador)",
   "Wi-Fi público só com VPN ou 4G",
   "Apps e sistema sempre atualizados",
-  "Conferi meus vazamentos (haveibeenpwned.com)",
+  "Conferi meus vazamentos aqui no Sentinela",
 ];
 const KEY = "sentinela-checklist";
 const saved = JSON.parse(localStorage.getItem(KEY) || "[]");
