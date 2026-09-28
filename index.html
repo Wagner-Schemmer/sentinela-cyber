@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sentinela Cyber — Senhas fortes e anti-phishing</title>
+<meta name="description" content="Analisador de força de senhas, gerador de senhas seguras e verificador de links suspeitos. 100% no navegador, nada sai do seu dispositivo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-in">
+    <a class="logo" href="#">🛡️ SENTINELA<span>_CYBER</span></a>
+    <nav><a href="#forca">Força</a><a href="#gerador">Gerador</a><a href="#links">Links</a><a href="#checklist">Checklist</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <p class="tag">// segurança para gente normal</p>
+    <h1>Descubra se sua senha <em>aguenta um ataque</em></h1>
+    <p class="sub">Analisador de senhas, gerador seguro e detector de links de phishing — tudo rodando <strong>100% no seu navegador</strong>. Nenhum dado sai do seu dispositivo.</p>
+    <div class="stats">
+      <div><strong id="stTests">0</strong><span>análises nesta sessão</span></div>
+      <div><strong>0</strong><span>dados enviados (zero!)</span></div>
+      <div><strong>4</strong><span>ferramentas grátis</span></div>
+    </div>
+  </section>
+
+  <section id="forca" class="panel">
+    <h2>01 — Medidor de força de senha</h2>
+    <div class="row">
+      <input type="password" id="pwd" placeholder="Digite uma senha para testar…" autocomplete="off">
+      <button id="togglePwd" class="ghost">👁️</button>
+    </div>
+    <div class="meter"><div id="meterFill"></div></div>
+    <p id="pwdVerdict" class="verdict">Aguardando senha…</p>
+    <ul id="pwdChecks" class="checks"></ul>
+    <p class="hint">Estimativa de quebra por força bruta: <strong id="crackTime">—</strong></p>
+  </section>
+
+  <section id="gerador" class="panel">
+    <h2>02 — Gerador de senhas</h2>
+    <div class="row">
+      <input type="text" id="genOut" readonly placeholder="Clique em gerar…">
+      <button id="copyGen" class="ghost">📋</button>
+    </div>
+    <label class="slider">Tamanho: <strong id="lenVal">20</strong>
+      <input type="range" id="genLen" min="8" max="64" value="20">
+    </label>
+    <div class="toggles">
+      <label><input type="checkbox" id="gUpper" checked> ABC</label>
+      <label><input type="checkbox" id="gLower" checked> abc</label>
+      <label><input type="checkbox" id="gDigit" checked> 123</label>
+      <label><input type="checkbox" id="gSym" checked> #@!</label>
+      <label><input type="checkbox" id="gAmb"> sem ambíguos (0/O, 1/l)</label>
+    </div>
+    <button id="genBtn" class="btn">⚡ Gerar senha forte</button>
+  </section>
+
+  <section id="links" class="panel">
+    <h2>03 — Verificador de link suspeito</h2>
+    <p class="sub">Cole um link recebido por WhatsApp, e-mail ou SMS. Analisamos <strong>12 sinais de phishing</strong> na hora.</p>
+    <div class="row">
+      <input type="text" id="urlIn" placeholder="https://exemplo-suspeito.com/promocao" autocomplete="off">
+      <button id="urlBtn" class="btn">🔍 Verificar</button>
+    </div>
+    <div id="urlResult"></div>
+  </section>
+
+  <section id="checklist" class="panel">
+    <h2>04 — Checklist de higiene digital <span id="chkProg" class="badge">0/8</span></h2>
+    <div id="chkList" class="checklist"></div>
+    <div class="meter"><div id="chkFill"></div></div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <p><strong>Sentinela Cyber</strong> — projeto educacional de Wagner Schemmer. Heurísticas locais, sem garantia absoluta: na dúvida, não clique.</p>
+</div></footer>
+
+<script src="script.js"></script>
+</body>
+</html>
