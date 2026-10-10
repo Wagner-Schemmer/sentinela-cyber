@@ -1,5 +1,9 @@
 # 🛡️ Sentinela Cyber
 
+[![Live](https://img.shields.io/badge/demo-ao_vivo-4ade80?style=for-the-badge&logo=vercel&logoColor=white)](https://sentinela-cyber.vercel.app)
+![JS](https://img.shields.io/badge/JavaScript-ES6-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
+![PWA](https://img.shields.io/badge/PWA-instalável-5A0FC8?style=flat-square&logo=pwa&logoColor=white)
+
 Analisador de força de senhas, gerador seguro e verificador de links de phishing + checklist de higiene digital.
 
 **100% client-side:** nenhum dado sai do navegador.
