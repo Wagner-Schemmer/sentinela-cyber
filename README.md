@@ -1,86 +1,44 @@
-<div align="center">
+# 🛡️ LAUDO Nº 001 — SENTINELA CYBER
 
-[![Stars](https://img.shields.io/github/stars/Wagner-Schemmer/sentinela-cyber?style=social)](https://github.com/Wagner-Schemmer/sentinela-cyber/stargazers)
-[![Live](https://img.shields.io/badge/demo-ao_vivo-34d399?style=for-the-badge&logo=vercel&logoColor=white)](https://sentinela-cyber.vercel.app)
-![JavaScript](https://img.shields.io/badge/JavaScript-ES6-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
-![PWA](https://img.shields.io/badge/PWA-instalável-5A0FC8?style=flat-square&logo=pwa&logoColor=white)
+**Classificação:** PÚBLICO · **Analista:** Wagner Schemmer · **Veredito:** ✅ SEGURO PARA USO
 
-  <a href="https://sentinela-cyber.vercel.app"><img alt="Sentinela Cyber — segurança para gente normal" src="docs/banner.svg" /></a>
+> Objeto periciado: kit de higiene digital 100% client-side.
+> Conclusão: nenhum dado do usuário sai do dispositivo em nenhum dos 5 testes.
 
-  <h1>Sentinela Cyber</h1>
+[![Abrir a cena](https://img.shields.io/badge/abrir_a_cena-ao_vivo-34d399?style=for-the-badge&logo=vercel&logoColor=white)](https://sentinela-cyber.vercel.app)
 
-  <p>
-    <b>Segurança para gente normal, 100% no navegador.</b>
-    <br />
-    Nenhum dado sai do seu dispositivo. Nem a senha testada, nem o link verificado.
-  </p>
+<a href="https://sentinela-cyber.vercel.app"><img src="docs/preview.png" alt="cena do crime: tudo local" /></a>
 
-  <p>
-    <a href="https://sentinela-cyber.vercel.app"><b>Demo</b></a> ·
-    <a href="#o-que-cada-ferramenta-faz">Ferramentas</a> ·
-    <a href="#como-rodar">Como rodar</a> ·
-    <a href="#como-se-compara">Comparar</a> ·
-    <a href="#stack">Stack</a>
-  </p>
-</div>
+## Testes executados
 
-<a href="https://sentinela-cyber.vercel.app"><img src="docs/preview.png" alt="Sentinela Cyber ao vivo" /></a>
+| # | Teste | Amostra | Resultado |
+|---|---|---|---|
+| 01 | Medidor de força | `Tr4balho&2026!` → 78 bits, ~3 mil anos p/ quebrar | ✅ SEGURO |
+| 02 | Vazamento real | SHA-1 parcial (k-anonymity, 5 chars viajam) | ✅ SEGURO |
+| 03 | Gerador | `crypto.getRandomValues`, 8–64 chars / frase PT-BR | ✅ SEGURO |
+| 04 | Links | `banc0-segur0.com` → score 12/100, 9 heurísticas | ✅ PHISHING |
+| 05 | Checklist | 8 itens de higiene, salvos em `localStorage` | ✅ SEGURO |
 
-O Sentinela Cyber é um kit gratuito de higiene digital: mede a força da sua senha em bits de entropia, consulta vazamentos reais sem expor sua senha, gera senhas fortes e dá nota de 0 a 100 para links suspeitos — tudo client-side, sem conta e sem servidor.
-
-## O que cada ferramenta faz
-
-| Ferramenta | O que faz | Seus dados |
-|---|---|---|
-| **Medidor de força** | Entropia em bits, tempo de quebra (10 bi tentativas/s), 7 checks | ✓ nunca saem do navegador |
-| **Vazamento real** | HaveIBeenPwned por k-anonymity (só 5 chars do SHA-1 viajam) | ✓ senha completa nunca viaja |
-| **Gerador** | `crypto.getRandomValues`: aleatória 8–64 ou frase-senha PT-BR | ✓ gerada localmente |
-| **Verificador de links** | Score 0–100, 9 heurísticas, relatório copiável p/ WhatsApp | ✓ análise local |
-| **Checklist + FAQ** | 8 itens de higiene digital salvos em `localStorage` | ✓ ficam no aparelho |
-
-## Como se compara
-
-| | Verificadores online comuns | Sentinela Cyber |
-|---|---|---|
-| Sua senha sai do aparelho | Na maioria, sim | **Não** |
-| Precisa de conta | Quase sempre | **Não** |
-| Funciona offline (PWA) | Raramente | **Sim** |
-| Código aberto | Raramente | **Sim** |
-
-## Como rodar
-
-1. Abra o `index.html` (Go Live no VSCode ou `python3 -m http.server` na pasta).
-2. Digite uma senha no medidor e veja a nota na hora.
-3. Instale como PWA no celular e use offline.
-
-## Estrutura
+## Cadeia de custódia (seus dados)
 
 ```
-sentinela-cyber/
-├── index.html      # markup + seções (medidor, vazamento, gerador, links, checklist, FAQ)
-├── styles.css      # tema dark cyber
-├── script.js       # entropia, 9 heurísticas, HIBP k-anonymity
-├── manifest.json   # PWA instalável
-└── api/            # health check p/ monitoramento
+senha digitada ──▶ RAM do navegador ──▶ ████ (não sai)
+link colado   ──▶ 9 heurísticas locais ──▶ nota 0–100
+5 chars SHA-1 ──▶ haveibeenpwned.com ──▶ "vazou / não vazou"
 ```
 
-## Personalizar
+Nada mais atravessa a fronteira. Sem conta, sem servidor, sem rastro.
 
-1. Pesos das 9 heurísticas em `script.js` (função de score 0–100).
-2. Textos e checklist em `index.html`.
-3. Deploy: conectar o repo na Vercel (zero config).
+## Reproduzir a perícia
 
-## Stack
+```bash
+git clone https://github.com/Wagner-Schemmer/sentinela-cyber.git
+cd sentinela-cyber && python3 -m http.server
+# → http://localhost:8000
+```
 
-HTML · CSS · JavaScript (zero dependências, zero build).
+Arquivos do caso: `index.html` (a cena) · `script.js` (o laudo) · `styles.css` (o escuro) · `manifest.json` (PWA p/ levar no bolso).
 
-## Quem faz
+## Assinatura
 
-<a href="https://github.com/Wagner-Schemmer/sentinela-cyber/graphs/contributors"><img src="https://contrib.rocks/image?repo=Wagner-Schemmer/sentinela-cyber" alt="contribuidores" /></a>
-
-## Star history
-
-<a href="https://www.star-history.com/#Wagner-Schemmer/sentinela-cyber&Date"><img alt="Star History" src="https://api.star-history.com/svg?repos=Wagner-Schemmer/sentinela-cyber&type=Date" /></a>
-
----
-Feito por [Wagner Schemmer](https://wagner-port.vercel.app) · [Portfólio](https://wagner-port.vercel.app) · [LinkedIn](https://www.linkedin.com/in/wagner-schemmer-martins-46950627a)
+JavaScript puro, zero dependências. Perito: [Wagner Schemmer](https://wagner-port.vercel.app) · [Portfólio](https://wagner-port.vercel.app)
