@@ -17,3 +17,18 @@ Analisador de força de senhas, gerador seguro e verificador de links de phishin
 
 ## Rodar
 Go Live no VSCode ou `python3 -m http.server` na pasta. Sem build, sem dependências.
+
+## Estrutura
+```
+sentinela-cyber/
+├── index.html      # markup + seções (medidor, vazamento, gerador, links, checklist, FAQ)
+├── styles.css      # tema dark cyber
+├── script.js       # entropia, zxcvbn-like, 9 heurísticas, HIBP k-anonymity
+├── manifest.json   # PWA instalável
+└── api/            # health check p/ monitoramento
+```
+
+## Personalizar
+1. Pesos das 9 heurísticas em `script.js` (função de score 0–100)
+2. Textos e checklist em `index.html`
+3. Deploy: conectar o repo na Vercel (zero config)
