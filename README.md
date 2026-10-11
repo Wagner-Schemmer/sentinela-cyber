@@ -55,10 +55,6 @@ Arquivos do caso: `index.html` (a cena) · `script.js` (o laudo) · `styles.css`
 
 JavaScript puro, zero dependências, zero build. PWA instalável, funciona offline.
 
-## Arquivo (star history)
-
-<a href="https://www.star-history.com/#Wagner-Schemmer/sentinela-cyber&Date"><img alt="Star History" src="https://api.star-history.com/svg?repos=Wagner-Schemmer/sentinela-cyber&type=Date" /></a>
-
 ## Assinatura
 
 Perito: [Wagner Schemmer](https://wagner-port.vercel.app) · [Portfólio](https://wagner-port.vercel.app) [Wagner Schemmer](https://wagner-port.vercel.app) · [Portfólio](https://wagner-port.vercel.app)
