@@ -19,6 +19,14 @@
 | 04 | Links | `banc0-segur0.com` → score 12/100, 9 heurísticas | ✅ PHISHING |
 | 05 | Checklist | 8 itens de higiene, salvos em `localStorage` | ✅ SEGURO |
 
+## Anexos fotográficos
+
+**Exhibit A — Gerador em operação:**
+<a href="https://sentinela-cyber.vercel.app"><img src="docs/sent-gerador.png" alt="gerador de senhas" /></a>
+
+**Exhibit B — Verificador de links + checklist:**
+<a href="https://sentinela-cyber.vercel.app"><img src="docs/sent-links.png" alt="verificador de links e checklist" /></a>
+
 ## Cadeia de custódia (seus dados)
 
 ```
@@ -39,6 +47,18 @@ cd sentinela-cyber && python3 -m http.server
 
 Arquivos do caso: `index.html` (a cena) · `script.js` (o laudo) · `styles.css` (o escuro) · `manifest.json` (PWA p/ levar no bolso).
 
+## Ficha do instrumento
+
+<div align="center">
+  <img src="https://skillicons.dev/icons?i=html,css,js&theme=dark" alt="HTML CSS JS" />
+</div>
+
+JavaScript puro, zero dependências, zero build. PWA instalável, funciona offline.
+
+## Arquivo (star history)
+
+<a href="https://www.star-history.com/#Wagner-Schemmer/sentinela-cyber&Date"><img alt="Star History" src="https://api.star-history.com/svg?repos=Wagner-Schemmer/sentinela-cyber&type=Date" /></a>
+
 ## Assinatura
 
-JavaScript puro, zero dependências. Perito: [Wagner Schemmer](https://wagner-port.vercel.app) · [Portfólio](https://wagner-port.vercel.app)
+Perito: [Wagner Schemmer](https://wagner-port.vercel.app) · [Portfólio](https://wagner-port.vercel.app) [Wagner Schemmer](https://wagner-port.vercel.app) · [Portfólio](https://wagner-port.vercel.app)
